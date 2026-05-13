@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-
+const server_functions = require('./server_functions')
 
 require('dotenv').config();
 
@@ -29,11 +29,10 @@ app.get("/clients/:id",
     }
 )
 
-app.post("/clients",
-    function(req,res){
-
-    }
-)
+app.post('/clients', function (req, res) {
+  const newUser = server_functions.createUser(req.body);
+  res.status(201).json(newUser);
+});
 
 app.put("/clients/id/:id",
     function(req,res){
