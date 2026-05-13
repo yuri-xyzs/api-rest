@@ -1,0 +1,11 @@
+# Dependências
+node_modules/
+# Variáveis de ambiente
+.env
+# Deixo muitos vims abertos
+*.swp
+# Logs extras
+logs/
+*.log
+npm-debug.log*
+
