@@ -22,7 +22,10 @@ app.get("/clients/:id",
     function(req,res){
         const { id } = req.params
         const client = data.find( user => user.id == id)
-        res.json(client || {result : 'client not found'} )
+        if (!client){
+            res.status(204).json()
+        }
+        res.json(client)
     }
 )
 
