@@ -32,6 +32,9 @@ def getUSerById(id):
     except Exception as err:
         return {"Result" : None, "erros": str(err)}
     
+def createUser(user : dict):
+    result = req.post(f'{PATH}/clients',json=user)
+    return result.json()
 if __name__ == '__main__':
-    result = getUSerById(3121)
-    print(f'Valor de user: {result}')
+    result = createUser({"name":'soneka',"username":"soneka_serio" })
+    print(f'Valor de createUser: {result}')
