@@ -8,13 +8,11 @@ dotenv.load_dotenv()
 PORT = os.getenv("PORT")
 DEFAULT_PATH ='http://127.0.0.1'
 PATH=f'{DEFAULT_PATH}:{PORT}'
+
 # Funções úteis
-
-
 def create_json_file(name, content):
     with open(file=name, mode='w', encoding='utf-8') as file:
         file.write(json.dumps(content, indent=4, ensure_ascii=False))
-
 
 # Funções de rota
 def userFindAll():
@@ -23,7 +21,6 @@ def userFindAll():
         return result
     except Exception as err:
         return {"result": None, "error": str(err)}
-
 
 def userFindById(id):
     try:
@@ -54,7 +51,21 @@ def deleteUserById( id : int ):
     except Exception as err:
         return {"Result": None, "erros" : str(err)}
 
-if __name__ == '__main__':
-    result = deleteUserById(11)
-    print(result.status_code)
-    print(result.json())
+
+
+
+opts = ['userFindAll', 'userFindById', 'userCreate', 'userUpdateById', 'deleteUserById']
+
+def menu(opts):
+    refac_opts = []
+    size = len(opts) - 1
+    for index_opt in range (0,size):
+        refac_opts.append(f'[{ index_opt + 1 }] {opts[index_opt]}')
+    return refac_opts
+
+refac = menu(opts=opts)
+
+print(f"""
+What is your choice?
+{'\n'.join(refac)}""")
+choice = str(input("Your choice: "))
