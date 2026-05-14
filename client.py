@@ -35,6 +35,11 @@ def getUSerById(id):
 def createUser(user : dict):
     result = req.post(f'{PATH}/clients',json=user)
     return result.json()
+
+def alterUser(body : dict, id : int):
+    result = req.put(f'{PATH}/clients/id/{id}',json=body)
+    return result.json()
+
 if __name__ == '__main__':
-    result = createUser({"name":'soneka',"username":"soneka_serio" })
+    result = alterUser({"name":'soneka',"username":"soneka_serio" },id=1)
     print(f'Valor de createUser: {result}')
