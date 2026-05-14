@@ -17,29 +17,44 @@ def create_json_file(name, content):
 
 
 # Funções de rota
-def getUsers():
+def userFindAll():
     try:
         result = req.get(f'{PATH}/clients')
-        return result.json()
+        return result
     except Exception as err:
         return {"result": None, "error": str(err)}
 
 
-def getUSerById(id):
+def userFindById(id):
     try:
         result = req.get(f'{PATH}/clients/{id}')
-        return result.json()
+        return result
     except Exception as err:
         return {"Result" : None, "erros": str(err)}
     
-def createUser(user : dict):
-    result = req.post(f'{PATH}/clients',json=user)
-    return result.json()
+def userCreate(user : dict):
+    try:
+        result = req.post(f'{PATH}/clients',json=user)
+        return result
+    except Exception as err:
+        return {"Result" : None, "erros": str(err)}
 
-def alterUser(body : dict, id : int):
-    result = req.put(f'{PATH}/clients/id/{id}',json=body)
-    return result.json()
+def userUpdateById( body : dict, id : int ):
+    try:
+        result = req.put(f'{PATH}/clients/id/{id}',json=body)
+        return result
+    except Exception as err:
+        return {"Result" : None, "erros": str(err)}
+
+def deleteUserById( id : int ):
+    try:
+        result = req.delete(url=f'{PATH}/clients/id/{id}')
+        return result
+        
+    except Exception as err:
+        return {"Result": None, "erros" : str(err)}
 
 if __name__ == '__main__':
-    result = alterUser({"name":'soneka',"username":"soneka_serio" },id=1)
-    print(f'Valor de createUser: {result}')
+    result = deleteUserById(11)
+    print(result.status_code)
+    print(result.json())
