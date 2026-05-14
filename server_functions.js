@@ -1,5 +1,17 @@
 // Funções de usuários 
-function createUser(data) {
+
+const data = require('./data.json')
+
+function userFindAll(){
+    return data
+}
+
+function userFindById(id){
+    const user = data.find(users => users.id == Number(id))
+    return user
+}
+
+function userCreate(data) {
   return {
     name: data?.name ?? null,
     username: data?.username ?? null,
@@ -28,7 +40,7 @@ function createUser(data) {
   };
 }
 
-function alterUser(Older,New){
+function userUpdateById(Older,New){
   return {
     name: New?.name ?? Older?.name,
     username: New?.username ?? Older?.username,
@@ -56,8 +68,36 @@ function alterUser(Older,New){
     }
   };
 }
+   
+function userDeleteById(id){
+    const numericId = Number(id)
+
+    if (isNaN(numericId)){
+        return { status: 'invalid_id' }
+    }
+
+    const index = data.findIndex(user =>
+        user.id === numericId
+    )
+
+    if (index === -1){
+        return { status: 'not_found' }
+    }
+
+    const user = data[index]
+
+    data.splice(index, 1)
+
+    return {
+        status: 'user_deleted',
+        user
+    }
+}
 
 module.exports = { 
-    createUser,
-    alterUser
+    userCreate,
+    userUpdateById,
+    userFindAll,
+    userFindById,
+    userDeleteById,
 };
