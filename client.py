@@ -1,5 +1,6 @@
+# IMPORTS 
 import requests as req
-import dotenv, os, json
+import dotenv, os, json, sys
 
 # Carregando o dotenv
 dotenv.load_dotenv()
@@ -14,7 +15,14 @@ def create_json_file(name, content):
     with open(file=name, mode='w', encoding='utf-8') as file:
         file.write(json.dumps(content, indent=4, ensure_ascii=False))
 
-# Funções de rota
+def format_index(opts : list) -> list:
+    refac_opts = []
+    size = len(opts) - 1
+    for index_opt in range (0,size):
+        refac_opts.append(f'[ { index_opt + 1 } ] {opts[index_opt]}')
+    return refac_opts
+
+# Funções de API
 def userFindAll():
     try:
         result = req.get(f'{PATH}/clients')
@@ -51,21 +59,76 @@ def deleteUserById( id : int ):
     except Exception as err:
         return {"Result": None, "erros" : str(err)}
 
+# Funções de interação
 
+def menu_userFindAll():
+    return userFindAll()
 
+def menu_userFindById():
+    user_id = input("Digite o ID: ")
+    return userFindById(user_id)
 
-opts = ['userFindAll', 'userFindById', 'userCreate', 'userUpdateById', 'deleteUserById']
+def menu_userCreate():
+    name = input("Nome: ")
+    age = input("Idade: ")
+    return userCreate({
+        "name": name,
+        "age": age
+    })
 
-def menu(opts):
-    refac_opts = []
-    size = len(opts) - 1
-    for index_opt in range (0,size):
-        refac_opts.append(f'[{ index_opt + 1 }] {opts[index_opt]}')
-    return refac_opts
+def menu_userUpdateById():
+    user_id = input("ID: ")
+    name = input("Novo nome: ")
+    age = input("Nova idade: ")
 
-refac = menu(opts=opts)
+    return userUpdateById({
+        "name": name,
+        "age": age
+    }, user_id)
 
-print(f"""
-What is your choice?
-{'\n'.join(refac)}""")
-choice = str(input("Your choice: "))
+def menu_deleteUserById():
+    user_id = input("Digite o ID: ")
+    return deleteUserById(user_id)
+
+def menu_deleteUserById():
+    return {"Result" : ""}
+# Relacionamento entre as funções de API e de interação
+
+interaction_handlers = {
+    "userFindAll"  : menu_userFindAll,
+    "userFindById" : menu_userFindById,
+    "userCreate" : menu_userCreate,
+    "userUpdateById" : menu_userUpdateById,
+    "deleteUserById" : menu_deleteUserById,
+}
+
+def menuMain():
+    options = list(interaction_handlers.keys())
+    if len(options) < 1:
+        return
+    while True:
+        choice=str(input(f"""Options:
+{'\n'.join(format_index(options))}
+[ ? ] Sair
+-> """))
+        if choice == '?' or choice.lower() == 'sair':
+            os.system('cls' if os.name == 'nt' else 'clear')
+            print('\33[32mOk, saindo\33[m')
+            return {"Result":"Bye"}
+        if choice in options:
+            return interaction_handlers[choice]()
+
+        if choice.isdigit():
+            try:
+                index = int(choice)
+                if index >= 1 and index <= len(options):
+                    return interaction_handlers[options[index - 1]]()
+            except Exception as err:
+                return err
+        else:
+            return {"Result":"Option not found"}
+
+result = menuMain()
+print(result)
+print(result.status_code)
+print(result.json())
