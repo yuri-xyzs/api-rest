@@ -3,8 +3,10 @@ const app = express();
 const server_functions = require('./server_functions')
 
 require('dotenv').config();
-
-
+const erros = {
+    user_not_found : {result : 'User not found'},
+    internal_error : { result : 'Internal server error' }
+}
 const data = require('./data.json');
 app.use(express.json()); // Linha para habilitar o uso de json (Express, estou usando JSON)
 const PORT = process.env.PORT;
@@ -14,7 +16,8 @@ const PORT = process.env.PORT;
 
 app.get("/clients",
     function(req,res){
-        res.json(data)
+        const users = server_functions.userFindAll()
+        res.json(users)
     }
 )
 
@@ -23,14 +26,14 @@ app.get("/clients/:id",
         const { id } = req.params
         const client = data.find( user => user.id == id)
         if (!client){
-            res.status(204).json({result : 'User not found'})
+            res.status(404).json({result : 'User not found'})
         }
         res.json(client)
     }
 )
 
 app.post('/clients', function (req, res) {
-    const newUser = server_functions.createUser(req.body);
+    const newUser = server_functions.userCreate(req.body);
     res.status(200).json(newUser);
 });
 
@@ -38,23 +41,44 @@ app.put("/clients/id/:id",
     function(req,res){
     const { id } = req.params
     const  newUser  = req.body
-    console.log(`newUser: ${newUser}\n\n<- <-`)
     const Older = data.find(user => user.id == id)
-    console.log(`Older: ${Older}\n\n<- <-`)
     if (!Older){
-        res.status(204).json({result : 'User not found'})
+        res.status(404).json(erros.user_not_found)
     }
-    const result = server_functions.alterUser(Older, newUser)
+    const result = server_functions.userUpdateById(Older, newUser)
     res.status(200).json(result)
     
 }
 )
 
-app.delete("/clients/id/:id",
-    function(req,res){
+app.delete("/clients/id/:id", function(req, res){
+    const { id } = req.params
+    
+    const result = server_functions.userDeleteById(id)
+    switch (result?.status){
+            
+        case 'not_found':
+            res.status(404).json(erros.user_not_found)
+            break;
 
+        case 'invalid_id':
+            res.status(400).json({
+                error: 'Invalid ID'
+            })
+            break;
+
+        case 'user_deleted':
+            res.status(200).json({
+                result: "User deleted",
+                user: result?.user
+            })
+
+            break;
+        default:
+            res.status(500).json(erros.internal_error)
     }
-)
+
+})
 
 
 
