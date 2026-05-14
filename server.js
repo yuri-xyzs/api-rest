@@ -34,7 +34,7 @@ app.get("/clients/:id",
 
 app.post('/clients', function (req, res) {
     const newUser = server_functions.userCreate(req.body);
-    res.status(200).json(newUser);
+    res.status(201).json(newUser);
 });
 
 app.put("/clients/id/:id",
