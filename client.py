@@ -10,6 +10,8 @@ PORT = os.getenv("PORT")
 DEFAULT_PATH ='http://127.0.0.1'
 PATH=f'{DEFAULT_PATH}:{PORT}'
 
+bye = {"bye":"true"}
+
 # Funções úteis
 def create_json_file(name, content):
     with open(file=name, mode='w', encoding='utf-8') as file:
@@ -21,6 +23,9 @@ def format_index(opts : list) -> list:
     for index_opt in range (0,size):
         refac_opts.append(f'[ { index_opt + 1 } ] {opts[index_opt]}')
     return refac_opts
+
+def menu_terminalClear():
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 # Funções de API
 def userFindAll():
@@ -95,11 +100,12 @@ def menu_deleteUserById():
 # Relacionamento entre as funções de API e de interação
 
 interaction_handlers = {
-    "userFindAll"  : menu_userFindAll,
-    "userFindById" : menu_userFindById,
-    "userCreate" : menu_userCreate,
-    "userUpdateById" : menu_userUpdateById,
-    "deleteUserById" : menu_deleteUserById,
+    "clear             " : menu_terminalClear,
+    "Find all users    " : menu_userFindAll,
+    "Find user by id   " : menu_userFindById,
+    "userCreate        " : menu_userCreate,
+    "userUpdateById    " : menu_userUpdateById,
+    "deleteUserById    " : menu_deleteUserById,
 }
 
 def menuMain():
@@ -112,9 +118,9 @@ def menuMain():
 [ ? ] Sair
 -> """))
         if choice == '?' or choice.lower() == 'sair':
-            os.system('cls' if os.name == 'nt' else 'clear')
+            menu_terminalClear()
             print('\33[32mOk, saindo\33[m')
-            return {"Result":"Bye"}
+            return bye
         if choice in options:
             return interaction_handlers[choice]()
 
@@ -128,7 +134,16 @@ def menuMain():
         else:
             return {"Result":"Option not found"}
 
-result = menuMain()
-print(result)
-print(result.status_code)
-print(result.json())
+def runMenu():
+    while True:
+        result = menuMain()
+        print(result)
+        if type(result) == dict:
+            print('not status code')
+        else:
+            print(result.json())
+        if result == bye:
+            break
+
+if __name__ == '__main__':
+    runMenu()
