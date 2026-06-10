@@ -28,6 +28,8 @@ app.get("/clients/:id",
         if (!client){
             res.status(404).json({result : 'User not found'})
         }
+    console.log(`Req feita: 
+ID selecionado: ${req.params.id || 'no ID'}`)
         res.json(client)
     }
 )
